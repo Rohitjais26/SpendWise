@@ -1,4 +1,5 @@
 import { formatCurrency } from '../utils/finance.js';
+import StatusMessage from './StatusMessage.jsx';
 
 const tableColumns = [
   { key: 'date', label: 'Date' },
@@ -34,22 +35,44 @@ function SortLabel({ column, onSortChange, sortDirection, sortField }) {
 
 function TransactionTable({
   canViewFlagged,
+  onResetFilters,
   onSortChange,
   sortDirection,
   sortField,
   transactions,
 }) {
   if (!transactions.length) {
-    return <p className="empty-state">No transactions match these filters.</p>;
+    return (
+      <StatusMessage
+        actionLabel="Reset Filters"
+        description="Try clearing search text or category filters to view records again."
+        onAction={onResetFilters}
+        title="No Transactions Match"
+        variant="empty"
+      />
+    );
   }
 
   return (
     <div className="table-wrap">
       <table>
+        <caption className="sr-only">
+          Transaction list with sortable columns for date, merchant, category, type, and amount.
+        </caption>
         <thead>
           <tr>
             {tableColumns.map((column) => (
-              <th key={column.key} scope="col">
+              <th
+                aria-sort={
+                  sortField === column.key
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : 'none'
+                }
+                key={column.key}
+                scope="col"
+              >
                 <SortLabel
                   column={column}
                   onSortChange={onSortChange}

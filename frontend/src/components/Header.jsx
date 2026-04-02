@@ -1,58 +1,69 @@
-import { motion } from 'framer-motion';
+import { motion as Motion, useReducedMotion } from 'framer-motion';
 
 function Header({ theme, onToggleTheme }) {
+  const shouldReduceMotion = useReducedMotion();
+
+  const motionKicker = shouldReduceMotion
+    ? {}
+    : {
+        animate: { opacity: 1, y: 0 },
+        initial: { opacity: 0, y: -8 },
+        transition: { duration: 0.4, ease: 'easeOut' },
+      };
+
+  const motionTitle = shouldReduceMotion
+    ? {}
+    : {
+        animate: { opacity: 1, y: 0 },
+        initial: { opacity: 0, y: -10 },
+        transition: { delay: 0.1, duration: 0.45, ease: 'easeOut' },
+      };
+
+  const motionSubtitle = shouldReduceMotion
+    ? {}
+    : {
+        animate: { opacity: 1 },
+        initial: { opacity: 0 },
+        transition: { delay: 0.2, duration: 0.45 },
+      };
+
   return (
     <header className="panel brand-bar">
       <div className="brand-copy">
-        <motion.p
-          className="brand-kicker"
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
-        >
+        <Motion.p className="brand-kicker" {...motionKicker}>
           Personal Finance Workspace
-        </motion.p>
+        </Motion.p>
 
-        <motion.h1
-          className="brand-title"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.45, ease: 'easeOut' }}
-        >
+        <Motion.h1 className="brand-title" {...motionTitle}>
           <span className="brand-gradient">💸 SpendWise</span>
-        </motion.h1>
+        </Motion.h1>
 
-        <motion.p
-          className="brand-subtitle"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.45 }}
-        >
+        <Motion.p className="brand-subtitle" {...motionSubtitle}>
           Monitor transactions, explore spending patterns, and review trends in one place.
-        </motion.p>
+        </Motion.p>
       </div>
 
       <div className="brand-actions">
-        <motion.button
-          className="theme-toggle"
+        <Motion.button
           aria-label="Toggle dark mode"
           aria-pressed={theme === 'dark'}
+          className="theme-toggle"
           onClick={onToggleTheme}
           type="button"
-          whileHover={{ y: -1 }}
-          whileTap={{ scale: 0.97 }}
+          whileHover={shouldReduceMotion ? undefined : { y: -1 }}
+          whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
         >
           <span className="theme-toggle-track" aria-hidden="true">
-            <motion.span
+            <Motion.span
               animate={{ x: theme === 'dark' ? 24 : 0 }}
               className="theme-toggle-thumb"
-              transition={{ duration: 0.22, ease: 'easeOut' }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.22, ease: 'easeOut' }}
             >
               {theme === 'dark' ? '🌙' : '☀️'}
-            </motion.span>
+            </Motion.span>
           </span>
           <span className="theme-toggle-label">{theme === 'dark' ? 'Dark' : 'Light'}</span>
-        </motion.button>
+        </Motion.button>
       </div>
     </header>
   );

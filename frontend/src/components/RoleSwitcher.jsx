@@ -9,14 +9,13 @@ function RoleSwitcher({ activeRole, onRoleChange, permissions }) {
 
   return (
     <div className="role-switcher-shell">
-      <div className="role-switcher" role="tablist" aria-label="Role switcher">
+      <div className="role-switcher" aria-label="Role switcher" role="group">
         {roleOptions.map((role) => (
           <button
-            aria-selected={activeRole === role.id}
+            aria-pressed={activeRole === role.id}
             className={`role-button ${activeRole === role.id ? 'is-active' : ''}`}
             key={role.id}
             onClick={() => onRoleChange(role.id)}
-            role="tab"
             type="button"
           >
             <span>{role.label}</span>

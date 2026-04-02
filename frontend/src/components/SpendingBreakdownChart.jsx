@@ -1,5 +1,6 @@
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
+import StatusMessage from './StatusMessage.jsx';
 
 ChartJS.register(ArcElement, Legend, Tooltip);
 
@@ -67,7 +68,13 @@ ChartJS.register(pseudo3DPiePlugin);
 
 function SpendingBreakdownChart({ data, theme = 'light' }) {
   if (!data.length) {
-    return <p className="empty-state">No expense data available for this filter set.</p>;
+    return (
+      <StatusMessage
+        description="Current filters contain no expense transactions to visualize."
+        title="No Spending Breakdown"
+        variant="empty"
+      />
+    );
   }
 
   const isDark = theme === 'dark';

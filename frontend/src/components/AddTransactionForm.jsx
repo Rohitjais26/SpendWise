@@ -1,34 +1,61 @@
+import { useEffect, useRef } from 'react';
+
 function AddTransactionForm({ draft, onClose, onFieldChange, onSubmit }) {
+  const amountInputRef = useRef(null);
+
+  useEffect(() => {
+    amountInputRef.current?.focus();
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+
   return (
     <div className="modal-backdrop" onClick={onClose} role="presentation">
-      <form className="modal-card" onClick={(event) => event.stopPropagation()} onSubmit={onSubmit}>
+      <form
+        aria-describedby="add-transaction-description"
+        aria-labelledby="add-transaction-title"
+        aria-modal="true"
+        className="modal-card"
+        onClick={(event) => event.stopPropagation()}
+        onSubmit={onSubmit}
+        role="dialog"
+      >
         <div className="modal-header">
-          <h3>Add Transaction</h3>
+          <h3 id="add-transaction-title">Add Transaction</h3>
           <button className="close-button" onClick={onClose} type="button">
             Close
           </button>
         </div>
 
-        <p className="modal-copy">
+        <p className="modal-copy" id="add-transaction-description">
           New expense entries above $2,000 are automatically marked for review.
         </p>
 
         <div className="form-grid">
-          <label className="field">
+          <label className="field" htmlFor="tx-type">
             <span>Type</span>
-            <select name="type" onChange={onFieldChange} value={draft.type}>
+            <select id="tx-type" name="type" onChange={onFieldChange} value={draft.type}>
               <option value="expense">Expense</option>
               <option value="income">Income</option>
             </select>
           </label>
 
-          <label className="field">
+          <label className="field" htmlFor="tx-amount">
             <span>Amount</span>
             <input
+              id="tx-amount"
               min="0.01"
               name="amount"
               onChange={onFieldChange}
               placeholder="0.00"
+              ref={amountInputRef}
               required
               step="0.01"
               type="number"
@@ -36,14 +63,22 @@ function AddTransactionForm({ draft, onClose, onFieldChange, onSubmit }) {
             />
           </label>
 
-          <label className="field">
+          <label className="field" htmlFor="tx-date">
             <span>Date</span>
-            <input name="date" onChange={onFieldChange} required type="date" value={draft.date} />
+            <input
+              id="tx-date"
+              name="date"
+              onChange={onFieldChange}
+              required
+              type="date"
+              value={draft.date}
+            />
           </label>
 
-          <label className="field">
+          <label className="field" htmlFor="tx-category">
             <span>Category</span>
             <input
+              id="tx-category"
               name="category"
               onChange={onFieldChange}
               placeholder="Groceries"
@@ -53,9 +88,10 @@ function AddTransactionForm({ draft, onClose, onFieldChange, onSubmit }) {
             />
           </label>
 
-          <label className="field field-full">
+          <label className="field field-full" htmlFor="tx-merchant">
             <span>Merchant / Source</span>
             <input
+              id="tx-merchant"
               name="merchant"
               onChange={onFieldChange}
               placeholder="Store or payer name"
@@ -65,9 +101,10 @@ function AddTransactionForm({ draft, onClose, onFieldChange, onSubmit }) {
             />
           </label>
 
-          <label className="field field-full">
+          <label className="field field-full" htmlFor="tx-note">
             <span>Note</span>
             <textarea
+              id="tx-note"
               name="note"
               onChange={onFieldChange}
               placeholder="Optional context"

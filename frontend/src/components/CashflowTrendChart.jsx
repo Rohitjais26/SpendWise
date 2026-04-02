@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import StatusMessage from './StatusMessage.jsx';
 
 ChartJS.register(CategoryScale, Filler, Legend, LineElement, LinearScale, PointElement, Tooltip);
 
@@ -31,7 +32,13 @@ function createGradient(chart, topColor, bottomColor) {
 
 function CashflowTrendChart({ data, theme = 'light' }) {
   if (!data.length) {
-    return <p className="empty-state">No chart data available for this filter set.</p>;
+    return (
+      <StatusMessage
+        description="Broaden your filters to repopulate monthly income and expense trends."
+        title="No Trend Data Available"
+        variant="empty"
+      />
+    );
   }
 
   const isDark = theme === 'dark';
