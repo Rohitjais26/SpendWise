@@ -1,46 +1,61 @@
-// frontend-vite/src/components/Header.jsx
+import { motion } from 'framer-motion';
 
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { logout, reset } from '../features/auth/authSlice';
+function Header({ theme, onToggleTheme }) {
+  return (
+    <header className="panel brand-bar">
+      <div className="brand-copy">
+        <motion.p
+          className="brand-kicker"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+        >
+          Personal Finance Workspace
+        </motion.p>
 
-function Header() {
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const { user } = useSelector((state) => state.auth);
+        <motion.h1
+          className="brand-title"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.45, ease: 'easeOut' }}
+        >
+          <span className="brand-gradient">💸 SpendWise</span>
+        </motion.h1>
 
-    const onLogout = () => {
-        dispatch(logout());
-        dispatch(reset());
-        navigate('/login');
-    };
+        <motion.p
+          className="brand-subtitle"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.45 }}
+        >
+          Monitor transactions, explore spending patterns, and review trends in one place.
+        </motion.p>
+      </div>
 
-    return (
-        <header className='flex justify-between items-center py-4 mb-6 border-b border-gray-200'>
-            <div className='logo'>
-              <Link to='/' className='text-2xl font-bold text-blue-600'>💸 SpendWise</Link>
-            </div>
-            <ul className='flex items-center space-x-5'>
-                {user ? (
-                    <>
-                        <li><Link to='/transactions' className='text-gray-700 hover:text-blue-600 font-medium'>Transactions</Link></li>
-                        <li><Link to='/budgets' className='text-gray-700 hover:text-blue-600 font-medium'>Budgets</Link></li>
-                        <li>
-                            <button className='px-4 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition' onClick={onLogout}>
-                                Logout
-                            </button>
-                        </li>
-                    </>
-                ) : (
-                    <>
-                        <li><Link to='/login' className='px-4 py-2 text-sm border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition'>Login</Link></li>
-                        <li><Link to='/register' className='px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition'>Register</Link></li>
-                    </>
-                )}
-            </ul>
-        </header>
-    );
+      <div className="brand-actions">
+        <motion.button
+          className="theme-toggle"
+          aria-label="Toggle dark mode"
+          aria-pressed={theme === 'dark'}
+          onClick={onToggleTheme}
+          type="button"
+          whileHover={{ y: -1 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <span className="theme-toggle-track" aria-hidden="true">
+            <motion.span
+              animate={{ x: theme === 'dark' ? 24 : 0 }}
+              className="theme-toggle-thumb"
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+            >
+              {theme === 'dark' ? '🌙' : '☀️'}
+            </motion.span>
+          </span>
+          <span className="theme-toggle-label">{theme === 'dark' ? 'Dark' : 'Light'}</span>
+        </motion.button>
+      </div>
+    </header>
+  );
 }
 
 export default Header;
