@@ -105,6 +105,6 @@ npm run preview
 
 ## If I had more time
 
-- add persistent storage for created transactions
-- add tests for filter/sort/role behavior
-- split large bundle with route-level code splitting
+add persistent storage for created transactions
+add tests for filter/sort/role behavior
+split large bundle with route-level code splitting
