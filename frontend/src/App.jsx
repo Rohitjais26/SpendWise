@@ -573,7 +573,7 @@ function App() {
           )}
         </main>
 
-        <footer className="app-footer">© 2026 by RJ Tech</footer>
+        <footer className="app-footer">© 2026 by Rohit Jaiswal</footer>
       </div>
 
       {isAddFormOpen && !uiState.isLoading && !uiState.error && (
