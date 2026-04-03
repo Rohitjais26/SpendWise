@@ -178,6 +178,19 @@ textarea:focus-visible {
   margin: 0;
 }
 
+.brand-title-row {
+  align-items: center;
+  display: inline-flex;
+  gap: 10px;
+}
+
+.brand-logo {
+  border-radius: 8px;
+  height: 38px;
+  object-fit: contain;
+  width: 38px;
+}
+
 .brand-gradient {
   color: var(--ink);
 }
@@ -1144,6 +1157,11 @@ tbody tr:hover {
   .brand-actions,
   .theme-toggle {
     width: 100%;
+  }
+
+  .brand-logo {
+    height: 32px;
+    width: 32px;
   }
 
   .hero-stats {

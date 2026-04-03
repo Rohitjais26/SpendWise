@@ -1,4 +1,5 @@
 import { motion as Motion, useReducedMotion } from 'framer-motion';
+import moneyLogo from '../../money-logo.gif';
 
 function Header({ theme, onToggleTheme }) {
   const shouldReduceMotion = useReducedMotion();
@@ -35,7 +36,10 @@ function Header({ theme, onToggleTheme }) {
         </Motion.p>
 
         <Motion.h1 className="brand-title" {...motionTitle}>
-          <span className="brand-gradient">💸 SpendWise</span>
+          <span className="brand-title-row">
+            <img alt="" aria-hidden="true" className="brand-logo" src={moneyLogo} />
+            <span className="brand-gradient">SpendWise</span>
+          </span>
         </Motion.h1>
 
         <Motion.p className="brand-subtitle" {...motionSubtitle}>
