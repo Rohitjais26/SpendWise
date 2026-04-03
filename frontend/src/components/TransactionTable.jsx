@@ -34,13 +34,33 @@ function SortLabel({ column, onSortChange, sortDirection, sortField }) {
 }
 
 function TransactionTable({
+  canAdd,
+  canExport,
   canViewFlagged,
+  onAddTransaction,
+  onExport,
   onResetFilters,
   onSortChange,
   sortDirection,
   sortField,
   transactions,
 }) {
+  const handleAddTransaction = () => {
+    if (!canAdd) {
+      return;
+    }
+
+    onAddTransaction?.();
+  };
+
+  const handleExportCsv = () => {
+    if (!canExport) {
+      return;
+    }
+
+    onExport?.();
+  };
+
   if (!transactions.length) {
     return (
       <StatusMessage
@@ -54,68 +74,83 @@ function TransactionTable({
   }
 
   return (
-    <div className="table-wrap">
-      <table>
-        <caption className="sr-only">
-          Transaction list with sortable columns for date, merchant, category, type, and amount.
-        </caption>
-        <thead>
-          <tr>
-            {tableColumns.map((column) => (
-              <th
-                aria-sort={
-                  sortField === column.key
-                    ? sortDirection === 'asc'
-                      ? 'ascending'
-                      : 'descending'
-                    : 'none'
-                }
-                key={column.key}
-                scope="col"
-              >
-                <SortLabel
-                  column={column}
-                  onSortChange={onSortChange}
-                  sortDirection={sortDirection}
-                  sortField={sortField}
-                />
-              </th>
-            ))}
-            {canViewFlagged && (
-              <th scope="col">
-                <span className="header-text">Risk Flag</span>
-              </th>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map((item) => (
-            <tr key={item.id}>
-              <td>{dateFormatter.format(new Date(item.date))}</td>
-              <td>
-                <p className="merchant">{item.merchant}</p>
-                {item.note && <p className="note">{item.note}</p>}
-              </td>
-              <td>{item.category}</td>
-              <td>
-                <span className={`type-chip ${item.type}`}>{item.type}</span>
-              </td>
-              <td className={item.type === 'income' ? 'amount-income' : 'amount-expense'}>
-                {item.type === 'income' ? '+' : '-'}
-                {formatCurrency(item.amount)}
-              </td>
+    <>
+      <div className="toolbar-actions table-actions">
+        {canAdd && (
+          <button className="btn btn-primary" onClick={handleAddTransaction} type="button">
+            + New Transaction
+          </button>
+        )}
+        {canExport && (
+          <button className="btn btn-ghost" onClick={handleExportCsv} type="button">
+            Export CSV
+          </button>
+        )}
+      </div>
+
+      <div className="table-wrap">
+        <table>
+          <caption className="sr-only">
+            Transaction list with sortable columns for date, merchant, category, type, and amount.
+          </caption>
+          <thead>
+            <tr>
+              {tableColumns.map((column) => (
+                <th
+                  aria-sort={
+                    sortField === column.key
+                      ? sortDirection === 'asc'
+                        ? 'ascending'
+                        : 'descending'
+                      : 'none'
+                  }
+                  key={column.key}
+                  scope="col"
+                >
+                  <SortLabel
+                    column={column}
+                    onSortChange={onSortChange}
+                    sortDirection={sortDirection}
+                    sortField={sortField}
+                  />
+                </th>
+              ))}
               {canViewFlagged && (
-                <td>
-                  <span className={`flag-chip ${item.flagged ? 'flagged' : 'safe'}`}>
-                    {item.flagged ? 'Review' : 'Normal'}
-                  </span>
-                </td>
+                <th scope="col">
+                  <span className="header-text">Risk Flag</span>
+                </th>
               )}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {transactions.map((item) => (
+              <tr key={item.id}>
+                <td>{dateFormatter.format(new Date(item.date))}</td>
+                <td>
+                  <p className="merchant">{item.merchant}</p>
+                  {item.note && <p className="note">{item.note}</p>}
+                </td>
+                <td>{item.category}</td>
+                <td>
+                  <span className={`type-chip ${item.type}`}>{item.type}</span>
+                </td>
+                <td className={item.type === 'income' ? 'amount-income' : 'amount-expense'}>
+                  {item.type === 'income' ? '+' : '-'}
+                  {formatCurrency(item.amount)}
+                </td>
+                {canViewFlagged && (
+                  <td>
+                    <span className={`flag-chip ${item.flagged ? 'flagged' : 'safe'}`}>
+                      {item.flagged ? 'Review' : 'Normal'}
+                    </span>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 

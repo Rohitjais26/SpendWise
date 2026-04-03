@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import AddTransactionForm from './components/AddTransactionForm.jsx';
 import CashflowTrendChart from './components/CashflowTrendChart.jsx';
 import DashboardSkeleton from './components/DashboardSkeleton.jsx';
@@ -56,8 +57,9 @@ const hasValidTransactionData = (items) =>
   );
 
 function App() {
+  const hasAuthSession = useSelector((state) => Boolean(state.auth?.user));
   const [theme, setTheme] = useState(getInitialTheme);
-  const [activeRole, setActiveRole] = useState('manager');
+  const [activeRole, setActiveRole] = useState('admin');
   const [transactions, setTransactions] = useState(seededTransactions);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -67,13 +69,15 @@ function App() {
   const [sortDirection, setSortDirection] = useState('desc');
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [draftTransaction, setDraftTransaction] = useState(createDefaultDraft);
+  const [addFormError, setAddFormError] = useState('');
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [uiState, setUiState] = useState({
     error: '',
     isLoading: true,
   });
 
-  const permissions = rolePermissions[activeRole];
+  // Derive permissions based on the state
+  const permissions = useMemo(() => rolePermissions[activeRole], [activeRole]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -162,6 +166,12 @@ function App() {
     });
   }, [categoryFilter, monthFilter, scopedTransactions, searchTerm, sortDirection, sortField, typeFilter]);
 
+  // Filter transactions based on 'canViewFlagged' permission
+  const filteredData = useMemo(() => {
+    if (permissions.canViewFlagged) return filteredTransactions;
+    return filteredTransactions.filter((txn) => !txn.flagged);
+  }, [filteredTransactions, permissions.canViewFlagged]);
+
   const summary = useMemo(() => summarizeTransactions(filteredTransactions), [filteredTransactions]);
 
   const averageExpenseTicket =
@@ -173,6 +183,19 @@ function App() {
   );
   const monthlyTrend = useMemo(() => buildMonthlyTrend(scopedTransactions), [scopedTransactions]);
   const flaggedCount = scopedTransactions.filter((item) => item.flagged).length;
+  const topExpenseInsight = categoryBreakdown[0] ?? null;
+  const largestTransaction = useMemo(() => {
+    if (!filteredTransactions.length) {
+      return null;
+    }
+
+    return filteredTransactions.reduce((largest, current) =>
+      current.amount > largest.amount ? current : largest,
+    );
+  }, [filteredTransactions]);
+  const flaggedShare = scopedTransactions.length
+    ? (flaggedCount / scopedTransactions.length) * 100
+    : 0;
 
   const handleSortChange = (field) => {
     if (field === sortField) {
@@ -186,41 +209,53 @@ function App() {
 
   const handleDraftFieldChange = (event) => {
     const { name, value } = event.target;
+    setAddFormError('');
     setDraftTransaction((current) => ({
       ...current,
       [name]: value,
     }));
   };
 
-  const closeAddModal = () => {
+  const openAddModal = useCallback(() => {
+    setAddFormError('');
+    setIsAddFormOpen(true);
+  }, []);
+
+  const closeAddModal = useCallback(() => {
+    setAddFormError('');
     setIsAddFormOpen(false);
     setDraftTransaction(createDefaultDraft());
-  };
+  }, []);
 
   const handleTransactionSubmit = (event) => {
     event.preventDefault();
 
     if (!permissions.canAddTransaction) {
+      setAddFormError('Current role cannot add transactions. Switch to Manager or Admin.');
       return;
     }
 
     const amountValue = Number(draftTransaction.amount);
-    if (!Number.isFinite(amountValue) || amountValue <= 0 || !draftTransaction.merchant.trim()) {
+    const merchantValue = draftTransaction.merchant.trim();
+    const dateValue = draftTransaction.date;
+    if (!Number.isFinite(amountValue) || amountValue <= 0 || !merchantValue || !dateValue) {
+      setAddFormError('Please enter a valid amount, date, and merchant/source.');
       return;
     }
 
     const nextTransaction = {
       amount: Number(amountValue.toFixed(2)),
       category: draftTransaction.category.trim() || 'General',
-      date: draftTransaction.date || toIsoDate(new Date()),
+      date: dateValue,
       flagged: draftTransaction.type === 'expense' && amountValue >= 2000,
       id: `txn-${Date.now()}`,
-      merchant: draftTransaction.merchant.trim(),
+      merchant: merchantValue,
       note: draftTransaction.note.trim(),
       type: draftTransaction.type,
     };
 
     setTransactions((current) => [nextTransaction, ...current]);
+    resetFilters();
     closeAddModal();
   };
 
@@ -391,6 +426,51 @@ function App() {
                 </article>
               </section>
 
+              <section className="panel insights-panel" aria-label="Insights section">
+                <div className="section-heading">
+                  <h2>Insights</h2>
+                  <p>Actionable observations generated from your current filters and state.</p>
+                </div>
+
+                <div className="insights-grid">
+                  <article className="insight-card">
+                    <p className="insight-label">Top Expense Category</p>
+                    <strong>{topExpenseInsight ? topExpenseInsight.label : 'No expense data'}</strong>
+                    <span>
+                      {topExpenseInsight
+                        ? formatCurrency(topExpenseInsight.value)
+                        : 'Add expense records to generate this insight.'}
+                    </span>
+                  </article>
+
+                  <article className="insight-card">
+                    <p className="insight-label">Largest Entry</p>
+                    <strong>{largestTransaction ? largestTransaction.merchant : 'No records'}</strong>
+                    <span>
+                      {largestTransaction
+                        ? `${largestTransaction.type === 'income' ? 'Income' : 'Expense'} - ${formatCurrency(largestTransaction.amount)}`
+                        : 'Create transactions to unlock this metric.'}
+                    </span>
+                  </article>
+
+                  <article className="insight-card">
+                    <p className="insight-label">Flagged Share</p>
+                    <strong>{scopedTransactions.length ? `${flaggedShare.toFixed(1)}%` : '0%'}</strong>
+                    <span>{`${flaggedCount} of ${scopedTransactions.length} visible records flagged.`}</span>
+                  </article>
+
+                  <article className="insight-card">
+                    <p className="insight-label">State Management</p>
+                    <strong>Redux Toolkit</strong>
+                    <span>
+                      {hasAuthSession
+                        ? 'Authenticated session is available in global store.'
+                        : 'Guest session is currently stored globally.'}
+                    </span>
+                  </article>
+                </div>
+              </section>
+
               <section className="panel transactions-panel" aria-label="Transaction explorer">
                 <div className="toolbar">
                   <div className="section-heading">
@@ -413,7 +493,7 @@ function App() {
                     <button
                       className="btn btn-primary"
                       disabled={!permissions.canAddTransaction}
-                      onClick={() => setIsAddFormOpen(true)}
+                      onClick={openAddModal}
                       type="button"
                     >
                       Add Transaction
@@ -478,11 +558,15 @@ function App() {
 
                 <TransactionTable
                   canViewFlagged={permissions.canViewFlagged}
+                  canExport={permissions.canExport}
+                  canAdd={permissions.canAddTransaction}
+                  onAddTransaction={openAddModal}
+                  onExport={exportAsCsv}
                   onResetFilters={resetFilters}
                   onSortChange={handleSortChange}
                   sortDirection={sortDirection}
                   sortField={sortField}
-                  transactions={filteredTransactions}
+                  transactions={filteredData}
                 />
               </section>
             </>
@@ -495,6 +579,7 @@ function App() {
       {isAddFormOpen && !uiState.isLoading && !uiState.error && (
         <AddTransactionForm
           draft={draftTransaction}
+          errorMessage={addFormError}
           onClose={closeAddModal}
           onFieldChange={handleDraftFieldChange}
           onSubmit={handleTransactionSubmit}

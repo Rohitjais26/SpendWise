@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-function AddTransactionForm({ draft, onClose, onFieldChange, onSubmit }) {
+function AddTransactionForm({ draft, errorMessage, onClose, onFieldChange, onSubmit }) {
   const amountInputRef = useRef(null);
 
   useEffect(() => {
@@ -37,6 +37,11 @@ function AddTransactionForm({ draft, onClose, onFieldChange, onSubmit }) {
         <p className="modal-copy" id="add-transaction-description">
           New expense entries above $2,000 are automatically marked for review.
         </p>
+        {errorMessage && (
+          <p className="modal-copy form-error" role="alert">
+            {errorMessage}
+          </p>
+        )}
 
         <div className="form-grid">
           <label className="field" htmlFor="tx-type">

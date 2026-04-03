@@ -1,135 +1,110 @@
-# SpendWise Finance Dashboard (Frontend Screening)
+# SpendWise - Finance Dashboard UI
 
-SpendWise is a mock-data financial dashboard built for a frontend screening assignment.
-The implementation focuses on product thinking, clean UI architecture, responsive behavior, accessibility, and practical state management.
+Hi, this is my frontend screening assignment build.
 
-## Assignment Focus
+I built a simple finance dashboard where a user can:
+- check financial summary cards
+- view trends and spending breakdown
+- explore transactions with filters/search/sort
+- switch roles and see UI capability changes
 
-- Build an interactive finance dashboard using static/mock data
-- Show a clear component architecture and maintainable code
-- Demonstrate responsiveness, RBAC behavior, and interaction quality
-- Provide documentation that explains decisions and tradeoffs
+The app is intentionally frontend-first and uses mock data so it runs without backend dependency.
 
-## What Is Implemented
+## Quick Requirement Check
 
-- Dashboard overview cards:
-  - Net balance
-  - Total income
-  - Total expenses
-  - Average expense ticket
-- Transaction explorer:
-  - Search by merchant and note
-  - Filter by category, type, and month
-  - Sort by date, merchant, category, type, and amount
-  - CSV export (role-gated)
-- Analytics:
-  - Enhanced cashflow trend chart with refined visual styling
-  - 3D-style spending breakdown pie chart (canvas depth effect)
-- RBAC simulation:
-  - `Viewer`: read-only, flagged items hidden
-  - `Analyst`: read-only, flagged items visible
-  - `Manager`: can add transactions
-  - `Admin`: can add transactions and export CSV
-- Theme and branding:
-  - Light/dark theme toggle with persistence in `localStorage`
-  - Animated header interactions and polished hero section
-- UX states:
-  - Loading skeleton while dashboard bootstraps
-  - Empty state components for charts and transactions
-  - Error state with retry flow for data bootstrapping
+- [x] Dashboard Overview with Summary Cards
+- [x] Time Based Visualization (cashflow trend chart)
+- [x] Categorical Visualization (spending breakdown pie)
+- [x] Transaction List with Details
+- [x] Transaction Filtering
+- [x] Transaction Sorting / Search
+- [x] Role Based UI (viewer/admin, plus analyst/manager)
+- [x] Insights Section
+- [x] State Management (Redux configured + local UI state where practical)
+- [x] Responsive Design
 
-## Architecture and State Approach
+## Features Included
 
-- Main orchestration in `src/App.jsx`:
-  - Holds UI state (filters, sorting, role, theme, modal visibility)
-  - Computes derived values using memoized selectors (`useMemo`)
-  - Controls loading/error states and retry behavior
-- Data source:
-  - Static seed data in `src/data/mockData.js`
-  - Utility transforms in `src/utils/finance.js`
-- Presentation layer:
-  - Small reusable components in `src/components/*`
-  - Shared status rendering with `StatusMessage`
-  - Dedicated skeleton loader with `DashboardSkeleton`
+### 1) Dashboard + Insights
+- Net balance, income, expenses, average expense ticket
+- Dedicated `Insights` section with:
+  - top expense category
+  - largest visible transaction
+  - flagged share
+  - state management note
 
-## Accessibility Enhancements
+### 2) Charts
+- Cashflow trend (line chart)
+- Spending pattern (pie chart with custom pseudo-3D effect)
+- Chart empty states when filtered data is unavailable
 
-- Skip link for keyboard users to jump to main content
-- Semantic landmarks (`main`, sections with labels)
-- Improved focus visibility for interactive elements
-- Accessible modal behavior:
-  - `role="dialog"` and `aria-modal`
-  - Described/labelled dialog metadata
-  - Escape key closes modal
-  - Initial focus lands in first input
-- Sortable table improvements:
-  - `aria-sort` for sorted columns
-  - Screen-reader caption
-- Reduced motion support:
-  - Honors `prefers-reduced-motion` to limit animations/transitions
+### 3) Transactions
+- Search by merchant/note
+- Filter by category, type, and month
+- Sort by date, merchant, category, type, and amount
+- Add transaction modal (role-gated)
+- CSV export (admin-gated)
 
-## Design and Interaction Decisions
+### 4) RBAC Demo
+- `Viewer`: read-only, cannot view flagged
+- `Analyst`: read-only, can view flagged
+- `Manager`: can add transactions
+- `Admin`: can add + export CSV
 
-- Kept the product as a single-page dashboard to optimize flow and context:
-  - Finance monitoring actions are tightly related
-  - Faster interaction loop with fewer route/context transitions
-- Prioritized visual hierarchy:
-  - Hero highlights key status indicators
-  - KPI grid gives immediate health snapshot
-  - Analytics and transaction controls follow a top-down decision flow
+### 5) UX / UI
+- Dark and light mode toggle
+- Animated header interactions
+- Loading skeleton
+- Error/empty states
+- Keyboard-friendly focus styles + skip link
 
-## Loading, Empty, and Error Strategy
+## Tech Stack
 
-- Loading:
-  - Dashboard skeleton placeholders provide structure-first feedback
-- Empty:
-  - Contextual empty components guide user to reset filters
-- Error:
-  - Data bootstrapping validation triggers an error card with retry action
-
-## Tradeoffs and Assumptions
-
-- No backend persistence by design for assignment scope
-- RBAC behavior is UI-simulated, not token/session enforced
-- Chart 3D effect is simulated via Chart.js plugin drawing (not true 3D engine)
-- Initial loader is intentionally lightweight to demonstrate UX state handling
+- React + Vite
+- Chart.js + react-chartjs-2
+- Framer Motion
+- Redux Toolkit + React Redux
+- Plain CSS (custom responsive layout)
 
 ## Local Setup
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Start development server:
-   ```bash
-   npm run dev
-   ```
-3. Build for production:
-   ```bash
-   npm run build
-   ```
-4. Preview production build:
-   ```bash
-   npm run preview
-   ```
+Run from `frontend` folder:
 
-## Project Structure
+```bash
+npm install
+npm run dev
+```
 
-- `src/App.jsx`: app shell, orchestration, and dashboard state
-- `src/components/`: reusable UI modules
-- `src/data/mockData.js`: seed records and RBAC definitions
-- `src/utils/finance.js`: financial transforms and CSV utility
-- `src/index.css`: design system, responsive layout, and themes
+Build:
 
-## Suggested Submission Extras
+```bash
+npm run build
+```
 
-- Add screenshots:
-  - Light theme dashboard
-  - Dark theme dashboard
-  - Role switch behavior
-  - Empty/error state examples
-- Add a short GIF walkthrough:
-  - Theme toggle
-  - Filters and sorting
-  - Add transaction
-  - RBAC differences
+Preview build:
+
+```bash
+npm run preview
+```
+
+## Notes / Tradeoffs
+
+- Main dashboard works on mock seeded data (`src/data/mockData.js`).
+- Backend is not required for demoing assignment features.
+- RBAC is simulated at UI level for screening scope.
+- I used local component state for fast dashboard interactions, and Redux store is wired at app root for global state architecture.
+
+## Project Structure (important files)
+
+- `src/App.jsx` - dashboard orchestration, filters, sorting, role logic
+- `src/components/*` - reusable UI pieces
+- `src/data/mockData.js` - transactions + role permissions
+- `src/utils/finance.js` - financial calculations and CSV formatter
+- `src/app/store.js` - Redux store setup
+- `src/main.jsx` - Redux Provider wiring
+
+## If I had more time
+
+- add persistent storage for created transactions
+- add tests for filter/sort/role behavior
+- split large bundle with route-level code splitting

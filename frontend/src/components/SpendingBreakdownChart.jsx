@@ -4,6 +4,7 @@ import StatusMessage from './StatusMessage.jsx';
 
 ChartJS.register(ArcElement, Legend, Tooltip);
 
+// Professional color palette for the breakdown
 const palette = ['#0f766e', '#0284c7', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#64748b'];
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -11,6 +12,9 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
 });
 
+/**
+ * Utility to calculate shadow colors for the 3D effect
+ */
 function darkenHexColor(hex, factor = 0.52) {
   if (!hex || typeof hex !== 'string' || !hex.startsWith('#')) {
     return '#1f2937';
@@ -26,6 +30,9 @@ function darkenHexColor(hex, factor = 0.52) {
   return `rgb(${red}, ${green}, ${blue})`;
 }
 
+/**
+ * Custom Chart.js plugin to draw stacked arc layers for a 3D effect
+ */
 const pseudo3DPiePlugin = {
   id: 'pseudo3DPie',
   beforeDatasetDraw(chart, args, options) {
@@ -48,6 +55,7 @@ const pseudo3DPiePlugin = {
         true,
       );
 
+      // Draw shadow layers
       for (let layer = depth; layer > 0; layer -= 1) {
         ctx.beginPath();
         ctx.moveTo(x, y + layer);
@@ -67,6 +75,7 @@ const pseudo3DPiePlugin = {
 ChartJS.register(pseudo3DPiePlugin);
 
 function SpendingBreakdownChart({ data, theme = 'light' }) {
+  // Handle empty state
   if (!data.length) {
     return (
       <StatusMessage
