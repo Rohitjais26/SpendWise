@@ -12,20 +12,20 @@ The app is intentionally frontend-first and uses mock data so it runs without ba
 
 ## Quick Requirement Check
 
-- [x] Dashboard Overview with Summary Cards
-- [x] Time Based Visualization (cashflow trend chart)
-- [x] Categorical Visualization (spending breakdown pie)
-- [x] Transaction List with Details
-- [x] Transaction Filtering
-- [x] Transaction Sorting / Search
-- [x] Role Based UI (viewer/admin, plus analyst/manager)
-- [x] Insights Section
-- [x] State Management (Redux configured + local UI state where practical)
-- [x] Responsive Design
+ Dashboard Overview with Summary Cards
+ Time Based Visualization (cashflow trend chart)
+ Categorical Visualization (spending breakdown pie)
+ Transaction List with Details
+ Transaction Filtering
+ Transaction Sorting / Search
+ Role Based UI (viewer/admin, plus analyst/manager)
+ Insights Section
+ State Management (Redux configured + local UI state where practical)
+ Responsive Design
 
 ## Features Included
 
-### 1) Dashboard + Insights
+ 1) Dashboard + Insights
 - Net balance, income, expenses, average expense ticket
 - Dedicated `Insights` section with:
   - top expense category
@@ -33,25 +33,25 @@ The app is intentionally frontend-first and uses mock data so it runs without ba
   - flagged share
   - state management note
 
-### 2) Charts
+ 2) Charts
 - Cashflow trend (line chart)
 - Spending pattern (pie chart with custom pseudo-3D effect)
 - Chart empty states when filtered data is unavailable
 
-### 3) Transactions
+ 3) Transactions
 - Search by merchant/note
 - Filter by category, type, and month
 - Sort by date, merchant, category, type, and amount
 - Add transaction modal (role-gated)
 - CSV export (admin-gated)
 
-### 4) RBAC Demo
+ 4) RBAC Demo
 - `Viewer`: read-only, cannot view flagged
 - `Analyst`: read-only, can view flagged
 - `Manager`: can add transactions
 - `Admin`: can add + export CSV
 
-### 5) UX / UI
+ 5) UX / UI
 - Dark and light mode toggle
 - Animated header interactions
 - Loading skeleton
